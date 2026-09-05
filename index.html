@@ -1,131 +1,474 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Dodge!</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omar — Game Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #17131f;
+    --bg-alt: #1f1a2b;
+    --text: #f3efe8;
+    --text-muted: #a89fb8;
+    --accent: #ffb347;
+    --accent-2: #6ee7d8;
+    --line: rgba(243, 239, 232, 0.12);
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     margin: 0;
-    background: #111;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    line-height: 1.5;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ---------- Nav ---------- */
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 22px 0;
+    background: transparent;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    border-bottom: 1px solid transparent;
+  }
+
+  nav.scrolled {
+    background: rgba(23, 19, 31, 0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  nav .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .brand {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.01em;
+  }
+
+  .brand span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.95rem;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative;
+    padding: 120px 0 140px;
+    overflow: hidden;
+  }
+
+  #particles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .hero .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 620px;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    line-height: 1.12;
+    font-weight: 700;
+    margin: 0 0 22px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.7s ease forwards 0.1s;
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    margin: 0 0 34px;
+    max-width: 480px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.7s ease forwards 0.25s;
+  }
+
+  .hero .actions {
+    display: flex;
+    gap: 16px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.7s ease forwards 0.4s;
+  }
+
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero h1, .hero p, .hero .actions {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 13px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .btn-solid {
+    background: var(--accent);
+    color: #1a1420;
+  }
+
+  .btn-outline {
+    border-color: var(--line);
+    color: var(--text);
+  }
+
+  /* ---------- Section shared ---------- */
+
+  section { padding: 90px 0; }
+
+  section h2 {
+    font-family: var(--display);
+    font-size: 1.9rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+
+  .section-intro {
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 0 48px;
+  }
+
+  /* ---------- About ---------- */
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 60px;
+    border-top: 1px solid var(--line);
+    padding-top: 56px;
+  }
+
+  .about-grid p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 460px;
+  }
+
+  .facts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .facts li {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.95rem;
+  }
+
+  .facts li:first-child { padding-top: 0; }
+
+  .facts .k { color: var(--text-muted); }
+  .facts .v { font-family: var(--display); font-weight: 500; }
+
+  /* ---------- Games ---------- */
+
+  .games {
+    background: var(--bg-alt);
+  }
+
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .game-tile {
+    background: rgba(243, 239, 232, 0.03);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px;
+  }
+
+  .game-tile.featured {
+    grid-column: span 2;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(255,179,71,0.08), rgba(110,231,216,0.05));
+  }
+
+  .game-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    color: var(--accent-2);
+    margin-bottom: 12px;
+  }
+
+  .game-tile h3 {
+    font-family: var(--display);
+    font-size: 1.3rem;
+    margin: 0 0 10px;
+  }
+
+  .featured h3 { font-size: 1.7rem; }
+
+  .game-tile p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0 0 18px;
+  }
+
+  .game-tile a {
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: var(--text);
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
+  }
+
+  @media (max-width: 700px) {
+    .game-grid { grid-template-columns: 1fr; }
+    .game-tile.featured { grid-column: span 1; }
+    .about-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Contact ---------- */
+
+  .contact .wrap {
+    max-width: 520px;
+  }
+
+  .contact p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin: 0 0 32px;
+  }
+
+  .contact-links {
     display: flex;
     flex-direction: column;
+    gap: 4px;
+  }
+
+  .contact-links a {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
-    font-family: sans-serif;
-    color: white;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    font-family: var(--display);
+    font-size: 1.1rem;
   }
-  canvas {
-    background: #1e1e2f;
-    border: 3px solid #7dd3fc;
-    border-radius: 12px;
+
+  .contact-links a:hover { color: var(--accent); }
+  .contact-links a:first-child { border-top: 1px solid var(--line); }
+
+  .contact-links small {
+    font-family: var(--body);
+    color: var(--text-muted);
+    font-size: 0.85rem;
   }
-  #score {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    color: #7dd3fc;
-  }
-  #gameOver {
-    display: none;
-    margin-top: 15px;
-    font-size: 1.3em;
-    color: #ff6b6b;
+
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--line);
+    color: var(--text-muted);
+    font-size: 0.85rem;
   }
 </style>
 </head>
 <body>
-  <div id="score">Score: 0</div>
-  <canvas id="game" width="400" height="500"></canvas>
-  <div id="gameOver">Game Over! Press R to restart</div>
+
+<nav id="nav">
+  <div class="wrap">
+    <div class="brand">omar<span>.</span>dev</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#games">Games</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <canvas id="particles"></canvas>
+  <div class="wrap">
+    <h1>Small worlds, built one scene at a time.</h1>
+    <p>I'm Omar — an indie developer making games in Godot. This is where I share what I'm building and what I've learned along the way.</p>
+    <div class="actions">
+      <a href="#games" class="btn btn-solid">See my games</a>
+      <a href="#contact" class="btn btn-outline">Get in touch</a>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <h2>About</h2>
+    <div class="about-grid">
+      <p>
+        I build games because I like figuring out how systems fit together — movement that feels right,
+        a level that teaches itself, a mechanic that's simple to learn but hard to put down.
+        Most of what's here started as a small idea I wanted to see working on screen.
+      </p>
+      <ul class="facts">
+        <li><span class="k">Engine</span><span class="v">Godot 4</span></li>
+        <li><span class="k">Focus</span><span class="v">2D gameplay & systems</span></li>
+        <li><span class="k">Currently</span><span class="v">First full release</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="games" id="games">
+  <div class="wrap">
+    <h2>Things I'm building</h2>
+    <p class="section-intro">A mix of finished experiments and works in progress.</p>
+    <div class="game-grid">
+      <div class="game-tile featured">
+        <span class="game-tag">Playable</span>
+        <h3>Dodge</h3>
+        <p>An endless arcade dodger — steer left and right to survive falling blocks that get faster the longer you last.</p>
+        <a href="games/dodge.html">Play in browser</a>
+      </div>
+      <div class="game-tile">
+        <span class="game-tag">Playable</span>
+        <h3>Chain Tap</h3>
+        <p>A fast reaction game — tap each target before the timer runs out. Every hit speeds things up.</p>
+        <a href="games/chain-tap.html">Play in browser</a>
+      </div>
+      <div class="game-tile">
+        <span class="game-tag">Coming soon</span>
+        <h3>Next Project</h3>
+        <p>Replace this tile once your next game is ready to share.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <h2>Say hi</h2>
+    <p>Working on something together, or just want to talk about game dev? Reach out.</p>
+    <div class="contact-links">
+      <a href="mailto:you@example.com">Email <small>you@example.com</small></a>
+      <a href="https://github.com/omaristhecoolestperson-ctrl" target="_blank">GitHub <small>@omaristhecoolestperson-ctrl</small></a>
+      <a href="#" target="_blank">itch.io <small>your games, playable</small></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Built by Omar.
+  </div>
+</footer>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-const scoreEl = document.getElementById("score");
-const gameOverEl = document.getElementById("gameOver");
-
-let player = { x: 180, y: 450, w: 40, h: 40, speed: 6 };
-let blocks = [];
-let score = 0;
-let gameOver = false;
-let keys = {};
-let frame = 0;
-let animId;
-
-document.addEventListener("keydown", e => {
-  keys[e.key] = true;
-  if (e.key === "r" || e.key === "R") {
-    if (gameOver) restart();
-  }
-});
-document.addEventListener("keyup", e => keys[e.key] = false);
-
-function spawnBlock() {
-  const size = 20 + Math.random() * 30;
-  blocks.push({
-    x: Math.random() * (canvas.width - size),
-    y: -size,
-    w: size,
-    h: size,
-    speed: 2 + Math.random() * 3 + score * 0.05
+  // Nav background on scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
   });
-}
 
-function restart() {
-  cancelAnimationFrame(animId);
-  player.x = 180;
-  blocks = [];
-  score = 0;
-  frame = 0;
-  gameOver = false;
-  gameOverEl.style.display = "none";
-  loop();
-}
+  // Ambient particle field in the hero (skipped if reduced motion is requested)
+  const canvas = document.getElementById('particles');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function update() {
-  if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
-  if (keys["ArrowRight"] && player.x < canvas.width - player.w) player.x += player.speed;
+  if (canvas && !prefersReducedMotion) {
+    const ctx = canvas.getContext('2d');
+    let w, h, particles;
 
-  blocks.forEach(b => b.y += b.speed);
-  blocks = blocks.filter(b => b.y < canvas.height + 50);
-
-  blocks.forEach(b => {
-    if (
-      player.x < b.x + b.w &&
-      player.x + player.w > b.x &&
-      player.y < b.y + b.h &&
-      player.y + player.h > b.y
-    ) {
-      gameOver = true;
+    function resize() {
+      w = canvas.width = canvas.offsetWidth;
+      h = canvas.height = canvas.offsetHeight;
     }
-  });
 
-  score++;
-  scoreEl.textContent = "Score: " + score;
-}
+    function makeParticles() {
+      particles = Array.from({ length: 45 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.6 + 0.4,
+        speed: Math.random() * 0.3 + 0.05,
+        alpha: Math.random() * 0.5 + 0.2
+      }));
+    }
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.y -= p.speed;
+        if (p.y < -10) p.y = h + 10;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 179, 71, ${p.alpha})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
 
-  ctx.fillStyle = "#7dd3fc";
-  ctx.fillRect(player.x, player.y, player.w, player.h);
-
-  ctx.fillStyle = "#ff6b6b";
-  blocks.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
-}
-
-function loop() {
-  if (gameOver) {
-    gameOverEl.style.display = "block";
-    return;
+    window.addEventListener('resize', () => { resize(); makeParticles(); });
+    resize();
+    makeParticles();
+    draw();
   }
-  frame++;
-  if (frame % 40 === 0) spawnBlock();
-  update();
-  draw();
-  animId = requestAnimationFrame(loop);
-}
-
-loop();
 </script>
+
 </body>
 </html>
