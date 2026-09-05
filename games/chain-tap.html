@@ -1,1 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chain Tap — Omar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #17131f;
+    --text: #f3efe8;
+    --text-muted: #a89fb8;
+    --accent: #ffb347;
+    --accent-2: #6ee7d8;
+    --line: rgba(243, 239, 232, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+  }
+  .top {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  a.back {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  a.back:hover { color: var(--text); }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .hud {
+    width: 380px;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: 12px;
+  }
+  #score { color: var(--accent); }
+  #best { color: var(--text-muted); font-size: 0.9rem; }
 
+  #arena {
+    position: relative;
+    width: 380px;
+    max-width: 100%;
+    height: 480px;
+    background: #1f1a2b;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  #timerbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--accent-2);
+    width: 100%;
+    transition: width 0.05s linear;
+  }
+
+  .target {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(23, 19, 31, 0.88);
+    text-align: center;
+    padding: 20px;
+  }
+
+  #overlay.hidden { display: none; }
+
+  #overlay p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  #overlay h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    margin: 0;
+  }
+
+  button.primary {
+    padding: 12px 26px;
+    background: var(--accent);
+    color: #1a1420;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .hint {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin-top: 12px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Chain Tap</h1>
+  <a class="back" href="../index.html">&larr; Back to portfolio</a>
+</div>
+
+<div class="hud">
+  <div id="score">Score: 0</div>
+  <div id="best">Best: 0</div>
+</div>
+
+<div id="arena">
+  <div id="timerbar"></div>
+  <div id="overlay">
+    <h2>Chain Tap</h2>
+    <p>Tap each target before the bar runs out. Every hit speeds things up.</p>
+    <button class="primary" id="startBtn">Start</button>
+  </div>
+</div>
+
+<div class="hint">Works with mouse or touch.</div>
+
+<script>
+const arena = document.getElementById("arena");
+const timerbar = document.getElementById("timerbar");
+const overlay = document.getElementById("overlay");
+const startBtn = document.getElementById("startBtn");
+const scoreEl = document.getElementById("score");
+const bestEl = document.getElementById("best");
+
+let score = 0;
+let best = 0;
+let running = false;
+let target = null;
+let allowedTime = 1400; // ms, shrinks as score climbs
+let deadline = 0;
+let rafId = null;
+
+startBtn.addEventListener("click", startGame);
+
+function startGame() {
+  score = 0;
+  allowedTime = 1400;
+  scoreEl.textContent = "Score: 0";
+  overlay.classList.add("hidden");
+  running = true;
+  spawnTarget();
+  tick();
+}
+
+function spawnTarget() {
+  if (target) target.remove();
+  const size = Math.max(30, 60 - score * 1.2);
+  const maxX = arena.clientWidth - size;
+  const maxY = arena.clientHeight - size - 6;
+
+  target = document.createElement("button");
+  target.className = "target";
+  target.style.width = size + "px";
+  target.style.height = size + "px";
+  target.style.left = Math.random() * maxX + "px";
+  target.style.top = (Math.random() * maxY) + 6 + "px";
+  target.addEventListener("click", onHit);
+  target.addEventListener("touchstart", e => { e.preventDefault(); onHit(); }, { passive: false });
+  arena.appendChild(target);
+
+  deadline = performance.now() + allowedTime;
+}
+
+function onHit() {
+  if (!running) return;
+  score++;
+  scoreEl.textContent = "Score: " + score;
+  allowedTime = Math.max(500, allowedTime - 35);
+  spawnTarget();
+}
+
+function tick(now) {
+  if (!running) return;
+  const remaining = deadline - performance.now();
+  const pct = Math.max(0, remaining / allowedTime) * 100;
+  timerbar.style.width = pct + "%";
+
+  if (remaining <= 0) {
+    endGame();
+    return;
+  }
+  rafId = requestAnimationFrame(tick);
+}
+
+function endGame() {
+  running = false;
+  cancelAnimationFrame(rafId);
+  if (target) target.remove();
+  best = Math.max(best, score);
+  bestEl.textContent = "Best: " + best;
+
+  overlay.innerHTML = `
+    <h2>Game over</h2>
+    <p>You scored ${score}. ${score >= best && score > 0 ? "New best!" : "Try to beat " + best + "."}</p>
+  `;
+  const btn = document.createElement("button");
+  btn.className = "primary";
+  btn.textContent = "Play again";
+  btn.addEventListener("click", startGame);
+  overlay.appendChild(btn);
+  overlay.classList.remove("hidden");
+  timerbar.style.width = "100%";
+}
+</script>
+
+</body>
+</html>
