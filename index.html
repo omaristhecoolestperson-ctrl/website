@@ -48,10 +48,14 @@ let blocks = [];
 let score = 0;
 let gameOver = false;
 let keys = {};
+let frame = 0;
+let animId;
 
 document.addEventListener("keydown", e => {
   keys[e.key] = true;
-  if (e.key === "r" && gameOver) restart();
+  if (e.key === "r" || e.key === "R") {
+    if (gameOver) restart();
+  }
 });
 document.addEventListener("keyup", e => keys[e.key] = false);
 
@@ -67,9 +71,11 @@ function spawnBlock() {
 }
 
 function restart() {
+  cancelAnimationFrame(animId);
   player.x = 180;
   blocks = [];
   score = 0;
+  frame = 0;
   gameOver = false;
   gameOverEl.style.display = "none";
   loop();
@@ -107,7 +113,6 @@ function draw() {
   blocks.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
 }
 
-let frame = 0;
 function loop() {
   if (gameOver) {
     gameOverEl.style.display = "block";
@@ -117,7 +122,7 @@ function loop() {
   if (frame % 40 === 0) spawnBlock();
   update();
   draw();
-  requestAnimationFrame(loop);
+  animId = requestAnimationFrame(loop);
 }
 
 loop();
