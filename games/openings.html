@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openings Trainer — Omar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #17131f;
+    --text: #f3efe8;
+    --text-muted: #a89fb8;
+    --accent: #ffb347;
+    --accent-2: #6ee7d8;
+    --line: rgba(243, 239, 232, 0.12);
+    --light-sq: #ded3c4;
+    --dark-sq: #2a2438;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 50px;
+  }
+  .top {
+    width: 760px;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  a.back {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  a.back:hover { color: var(--text); }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  .layout {
+    width: 760px;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+  }
+
+  .opening-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .opening-btn {
+    text-align: left;
+    padding: 12px 14px;
+    background: rgba(243,239,232,0.03);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .opening-btn:hover { border-color: var(--accent-2); }
+  .opening-btn.active {
+    border-color: var(--accent);
+    background: rgba(255, 179, 71, 0.08);
+    color: var(--accent);
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 380px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .sq {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.2rem, 3.6vw, 1.8rem);
+  }
+  .sq.light { background: var(--light-sq); }
+  .sq.dark { background: var(--dark-sq); }
+  .sq.from::after, .sq.to::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 179, 71, 0.28);
+  }
+  .piece-w { color: #f7f4ee; text-shadow: 0 1px 1px rgba(0,0,0,0.5); position: relative; z-index: 1; }
+  .piece-b { color: #17131f; position: relative; z-index: 1; }
+
+  .info {
+    width: 380px;
+    max-width: 100%;
+    margin-top: 16px;
+  }
+  .info h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    margin: 0 0 6px;
+  }
+  .info p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0 0 14px;
+  }
+  .moveline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    min-height: 1.4em;
+  }
+  .moveline span { color: var(--text-muted); }
+  .moveline span.done { color: var(--text); }
+  .moveline span.current { color: var(--accent); }
+
+  .step-controls {
+    display: flex;
+    gap: 10px;
+  }
+  button.small {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  button.small:hover:not(:disabled) { border-color: var(--accent); }
+  button.small:disabled { opacity: 0.35; cursor: default; }
+
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Openings Trainer</h1>
+  <a class="back" href="../index.html">&larr; Back to portfolio</a>
+</div>
+
+<div class="layout">
+  <div class="opening-list" id="openingList"></div>
+
+  <div class="right">
+    <div id="board"></div>
+    <div class="info">
+      <h2 id="openingName"></h2>
+      <p id="openingDesc"></p>
+      <div class="moveline" id="moveline"></div>
+      <div class="step-controls">
+        <button class="small" id="prevBtn">&larr; Prev</button>
+        <button class="small" id="nextBtn">Next &rarr;</button>
+        <button class="small" id="startBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PIECE_GLYPH = {
+  w: { k: '\u2654', q: '\u2655', r: '\u2656', b: '\u2657', n: '\u2658', p: '\u2659' },
+  b: { k: '\u265A', q: '\u265B', r: '\u265C', b: '\u265D', n: '\u265E', p: '\u265F' },
+};
+
+function sq(alg) {
+  const c = alg.charCodeAt(0) - 97;
+  const r = 8 - parseInt(alg[1], 10);
+  return { r, c };
+}
+
+function initialBoard() {
+  const board = new Array(8).fill(null).map(() => new Array(8).fill(null));
+  const back = ['r','n','b','q','k','b','n','r'];
+  for (let c = 0; c < 8; c++) {
+    board[0][c] = { type: back[c], color: 'b' };
+    board[1][c] = { type: 'p', color: 'b' };
+    board[6][c] = { type: 'p', color: 'w' };
+    board[7][c] = { type: back[c], color: 'w' };
+  }
+  return board;
+}
+
+// Each opening: a fixed, known-correct sequence of book moves.
+// "from"/"to" are algebraic squares. "label" is what's shown in the move list.
+const OPENINGS = [
+  {
+    name: "Italian Game",
+    desc: "A classical opening that develops pieces fast and aims straight at the weak f7 square.",
+    moves: [
+      { from: 'e2', to: 'e4', label: 'e4' },
+      { from: 'e7', to: 'e5', label: 'e5' },
+      { from: 'g1', to: 'f3', label: 'Nf3' },
+      { from: 'b8', to: 'c6', label: 'Nc6' },
+      { from: 'f1', to: 'c4', label: 'Bc4', note: 'The bishop eyes f7 immediately — the whole point of the opening.' },
+    ],
+  },
+  {
+    name: "Ruy Lopez",
+    desc: "One of the oldest openings in chess. White pins the knight that defends e5, applying long-term pressure.",
+    moves: [
+      { from: 'e2', to: 'e4', label: 'e4' },
+      { from: 'e7', to: 'e5', label: 'e5' },
+      { from: 'g1', to: 'f3', label: 'Nf3' },
+      { from: 'b8', to: 'c6', label: 'Nc6' },
+      { from: 'f1', to: 'b5', label: 'Bb5', note: 'The signature move — pinning the c6 knight to the king.' },
+    ],
+  },
+  {
+    name: "Sicilian Defense",
+    desc: "Black's sharpest, most popular reply to e4 — fighting for the center from the side instead of head-on.",
+    moves: [
+      { from: 'e2', to: 'e4', label: 'e4' },
+      { from: 'c7', to: 'c5', label: 'c5', note: 'Black avoids mirroring White and unbalances the position early.' },
+      { from: 'g1', to: 'f3', label: 'Nf3' },
+      { from: 'd7', to: 'd6', label: 'd6' },
+    ],
+  },
+  {
+    name: "Queen's Gambit",
+    desc: "White offers a pawn to gain a strong center and freer piece development.",
+    moves: [
+      { from: 'd2', to: 'd4', label: 'd4' },
+      { from: 'd7', to: 'd5', label: 'd5' },
+      { from: 'c2', to: 'c4', label: 'c4', note: 'The "gambit" — the c-pawn offers itself to pull Black\'s d-pawn away from the center.' },
+      { from: 'e7', to: 'e6', label: 'e6' },
+    ],
+  },
+  {
+    name: "French Defense",
+    desc: "A solid, slightly cramped setup for Black that immediately challenges White's center from behind a wall of pawns.",
+    moves: [
+      { from: 'e2', to: 'e4', label: 'e4' },
+      { from: 'e7', to: 'e6', label: 'e6' },
+      { from: 'd2', to: 'd4', label: 'd4' },
+      { from: 'd7', to: 'd5', label: 'd5' },
+    ],
+  },
+  {
+    name: "King's Indian Defense",
+    desc: "Black lets White build a big center on purpose, planning to fianchetto the bishop and attack that center later.",
+    moves: [
+      { from: 'd2', to: 'd4', label: 'd4' },
+      { from: 'g8', to: 'f6', label: 'Nf6' },
+      { from: 'c2', to: 'c4', label: 'c4' },
+      { from: 'g7', to: 'g6', label: 'g6', note: 'Preparing Bg7 — the bishop will stare down the whole board from the corner.' },
+    ],
+  },
+];
+
+let current = 0;
+let step = 0; // number of moves played so far (0 = starting position)
+
+const openingListEl = document.getElementById('openingList');
+const boardEl = document.getElementById('board');
+const nameEl = document.getElementById('openingName');
+const descEl = document.getElementById('openingDesc');
+const movelineEl = document.getElementById('moveline');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const startBtn = document.getElementById('startBtn');
+
+OPENINGS.forEach((o, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'opening-btn';
+  btn.textContent = o.name;
+  btn.addEventListener('click', () => selectOpening(i));
+  openingListEl.appendChild(btn);
+});
+
+function selectOpening(i) {
+  current = i;
+  step = 0;
+  document.querySelectorAll('.opening-btn').forEach((b, idx) => b.classList.toggle('active', idx === i));
+  render();
+}
+
+function boardAtStep(n) {
+  const board = initialBoard();
+  const opening = OPENINGS[current];
+  let lastFrom = null, lastTo = null;
+  for (let i = 0; i < n; i++) {
+    const mv = opening.moves[i];
+    const f = sq(mv.from), t = sq(mv.to);
+    board[t.r][t.c] = board[f.r][f.c];
+    board[f.r][f.c] = null;
+    lastFrom = f; lastTo = t;
+  }
+  return { board, lastFrom, lastTo };
+}
+
+function render() {
+  const opening = OPENINGS[current];
+  nameEl.textContent = opening.name;
+  descEl.textContent = opening.desc;
+
+  const { board, lastFrom, lastTo } = boardAtStep(step);
+
+  boardEl.innerHTML = '';
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const s = document.createElement('div');
+      s.className = 'sq ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+      if (lastFrom && lastFrom.r === r && lastFrom.c === c) s.classList.add('from');
+      if (lastTo && lastTo.r === r && lastTo.c === c) s.classList.add('to');
+      const piece = board[r][c];
+      if (piece) {
+        const span = document.createElement('span');
+        span.textContent = PIECE_GLYPH[piece.color][piece.type];
+        span.className = piece.color === 'w' ? 'piece-w' : 'piece-b';
+        s.appendChild(span);
+      }
+      boardEl.appendChild(s);
+    }
+  }
+
+  movelineEl.innerHTML = opening.moves.map((m, i) => {
+    const cls = i < step ? 'done' : (i === step ? 'current' : '');
+    return '<span class="' + cls + '">' + m.label + '</span>';
+  }).join(' &nbsp; ');
+
+  const noteMove = step > 0 ? opening.moves[step - 1] : null;
+  if (noteMove && noteMove.note) {
+    descEl.textContent = noteMove.note;
+  } else {
+    descEl.textContent = opening.desc;
+  }
+
+  prevBtn.disabled = step === 0;
+  nextBtn.disabled = step >= opening.moves.length;
+}
+
+prevBtn.addEventListener('click', () => { if (step > 0) { step--; render(); } });
+nextBtn.addEventListener('click', () => { if (step < OPENINGS[current].moves.length) { step++; render(); } });
+startBtn.addEventListener('click', () => { step = 0; render(); });
+
+selectOpening(0);
+</script>
+
+</body>
+</html>
