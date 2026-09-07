@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Would You Rather — Omar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #17131f;
+    --bg-alt: #1f1a2b;
+    --text: #f3efe8;
+    --text-muted: #a89fb8;
+    --accent: #ffb347;
+    --accent-2: #6ee7d8;
+    --line: rgba(243, 239, 232, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 50px;
+  }
+  .top {
+    width: 520px;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  a.back {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  a.back:hover { color: var(--text); }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  .card {
+    width: 520px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .option {
+    padding: 26px 22px;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .option:hover { border-color: var(--accent-2); }
+  .option.chosen {
+    border-color: var(--accent);
+    background: rgba(255, 179, 71, 0.08);
+    color: var(--accent);
+  }
+  .option:disabled { cursor: default; }
+
+  .or {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+  }
+
+  #reaction {
+    text-align: center;
+    color: var(--accent-2);
+    font-size: 0.95rem;
+    min-height: 1.4em;
+    margin-top: 6px;
+  }
+
+  #nextBtn {
+    margin-top: 18px;
+    align-self: center;
+    padding: 12px 26px;
+    background: var(--accent);
+    color: #1a1420;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Would You Rather</h1>
+  <a class="back" href="../index.html">&larr; Back to portfolio</a>
+</div>
+
+<div class="card">
+  <button class="option" id="optA"></button>
+  <div class="or">OR</div>
+  <button class="option" id="optB"></button>
+  <div id="reaction"></div>
+</div>
+
+<button id="nextBtn">Next question</button>
+
+<script>
+const PROMPTS = [
+  ["give up your keyboard for a controller forever", "give up your mouse for a trackpad forever"],
+  ["only ever code in the dark theme", "only ever code in the light theme"],
+  ["have infinite time but a laptop that overheats every hour", "have three hours a day but a perfect machine"],
+  ["ship a buggy game everyone plays", "ship a perfect game nobody finds"],
+  ["debug by print statements forever", "debug with a debugger that lies 10% of the time"],
+  ["have your code auto-format itself wrong every save", "never be able to auto-format at all"],
+  ["only build 2D games", "only build 3D games"],
+  ["work with no internet but great snacks", "work with fast internet but no snacks"],
+  ["have one great idea a year", "have a hundred mediocre ideas a day"],
+  ["explain your code to a rubber duck that talks back sarcastically", "explain it to total silence"],
+];
+
+const REACTIONS = [
+  "Bold choice.",
+  "Interesting.",
+  "Could've gone either way, honestly.",
+  "That tracks.",
+  "Noted.",
+  "Fair enough.",
+];
+
+let order = [];
+let idx = 0;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const optA = document.getElementById('optA');
+const optB = document.getElementById('optB');
+const reactionEl = document.getElementById('reaction');
+const nextBtn = document.getElementById('nextBtn');
+
+function loadQuestion() {
+  if (idx >= order.length) order = shuffle(PROMPTS), idx = 0;
+  const [a, b] = order[idx];
+  optA.textContent = a;
+  optB.textContent = b;
+  optA.classList.remove('chosen');
+  optB.classList.remove('chosen');
+  optA.disabled = false;
+  optB.disabled = false;
+  reactionEl.textContent = '';
+  nextBtn.style.display = 'none';
+}
+
+function choose(el) {
+  optA.disabled = true;
+  optB.disabled = true;
+  el.classList.add('chosen');
+  reactionEl.textContent = REACTIONS[Math.floor(Math.random() * REACTIONS.length)];
+  nextBtn.style.display = 'inline-block';
+}
+
+optA.addEventListener('click', () => choose(optA));
+optB.addEventListener('click', () => choose(optB));
+nextBtn.addEventListener('click', () => { idx++; loadQuestion(); });
+
+order = shuffle(PROMPTS);
+loadQuestion();
+</script>
+
+</body>
+</html>
