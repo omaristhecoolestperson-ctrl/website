@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stardust — Omar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #17131f;
+    --bg-alt: #1f1a2b;
+    --text: #f3efe8;
+    --text-muted: #a89fb8;
+    --accent: #ffb347;
+    --accent-2: #6ee7d8;
+    --line: rgba(243, 239, 232, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 60px;
+  }
+  .top {
+    width: 780px;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  a.back {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  a.back:hover { color: var(--text); }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  p.sub {
+    width: 780px;
+    max-width: 100%;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0 0 20px;
+  }
+
+  .layout {
+    width: 780px;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .stats {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  #total {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  #rate {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .clicker-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #star {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff3d6, var(--accent) 45%, #b5731f 100%);
+    box-shadow: 0 0 60px rgba(255, 179, 71, 0.45), inset 0 -10px 20px rgba(0,0,0,0.25);
+    border: none;
+    cursor: pointer;
+    font-size: 3.5rem;
+  }
+  #star:active { transform: scale(0.96); }
+
+  .float {
+    position: absolute;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--accent-2);
+    pointer-events: none;
+    animation: floatUp 0.8s ease forwards;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-50px); }
+  }
+
+  .panel {
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .panel h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    margin: 0 0 12px;
+  }
+
+  .shop-item {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: rgba(243,239,232,0.03);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+  }
+  .shop-item:hover:not(:disabled) { border-color: var(--accent); }
+  .shop-item:disabled { opacity: 0.4; cursor: default; }
+  .shop-item .name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+  }
+  .shop-item .desc {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    margin-top: 2px;
+  }
+  .shop-item .cost {
+    color: var(--accent-2);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .shop-item .owned {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-left: 8px;
+  }
+
+  .controls {
+    width: 780px;
+    max-width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  button.small {
+    padding: 9px 16px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text-muted);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+  button.small:hover { border-color: #ff8b8b; color: #ff8b8b; }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Stardust</h1>
+  <a class="back" href="../index.html">&larr; Back to portfolio</a>
+</div>
+<p class="sub">Click the star. Buy things. Watch the number go up. Progress saves automatically.</p>
+
+<div class="layout">
+  <div class="clicker-zone">
+    <div class="stats">
+      <div id="total">0</div>
+      <div id="rate">0 / sec</div>
+    </div>
+    <button id="star">\u2728</button>
+  </div>
+
+  <div class="panel">
+    <h2>Generators</h2>
+    <div id="generatorList"></div>
+    <h2 style="margin-top:18px;">Click power</h2>
+    <div id="upgradeList"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="small" id="resetBtn">Reset progress</button>
+</div>
+
+<script>
+const SAVE_KEY = 'stardust-clicker-save';
+
+const GENERATORS = [
+  { id: 'firefly', name: 'Firefly', desc: 'A little light, a little dust.', baseCost: 15, rate: 0.1 },
+  { id: 'satellite', name: 'Satellite', desc: 'Orbiting, collecting, always on.', baseCost: 100, rate: 1 },
+  { id: 'comet', name: 'Comet', desc: 'Streaks by, leaves stardust behind.', baseCost: 1100, rate: 8 },
+  { id: 'star', name: 'Star', desc: 'Burns bright, burns constant.', baseCost: 12000, rate: 47 },
+  { id: 'nebula', name: 'Nebula', desc: 'A whole cloud of the stuff.', baseCost: 130000, rate: 260 },
+  { id: 'galaxy', name: 'Galaxy', desc: 'Billions of stars, working for you.', baseCost: 1400000, rate: 1400 },
+];
+
+const UPGRADES = [
+  { id: 'steady', name: 'Steady Hand', desc: '+1 stardust per click', baseCost: 50, power: 1 },
+  { id: 'focus', name: 'Focused Mind', desc: '+5 stardust per click', baseCost: 800, power: 5 },
+  { id: 'reach', name: 'Longer Reach', desc: '+25 stardust per click', baseCost: 9000, power: 25 },
+];
+
+let state = {
+  total: 0,
+  clickPower: 1,
+  owned: {},   // id -> count
+  bought: {},  // id -> count for upgrades
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state = Object.assign(state, parsed);
+    }
+  } catch (e) { /* ignore corrupt save */ }
+}
+
+function save() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable, continue without saving */ }
+}
+
+function fmt(n) {
+  if (n < 1000) return Math.floor(n).toString();
+  const units = ['K','M','B','T','Qa','Qi'];
+  let u = -1;
+  while (n >= 1000 && u < units.length - 1) { n /= 1000; u++; }
+  return n.toFixed(2) + units[u];
+}
+
+function costFor(baseCost, owned) {
+  return Math.ceil(baseCost * Math.pow(1.15, owned));
+}
+
+function totalRate() {
+  let r = 0;
+  for (const g of GENERATORS) r += (state.owned[g.id] || 0) * g.rate;
+  return r;
+}
+
+function totalClickPower() {
+  let p = state.clickPower;
+  for (const u of UPGRADES) p += (state.bought[u.id] || 0) * u.power;
+  return p;
+}
+
+const totalEl = document.getElementById('total');
+const rateEl = document.getElementById('rate');
+const starBtn = document.getElementById('star');
+const generatorList = document.getElementById('generatorList');
+const upgradeList = document.getElementById('upgradeList');
+const resetBtn = document.getElementById('resetBtn');
+
+function renderShop() {
+  generatorList.innerHTML = '';
+  GENERATORS.forEach(g => {
+    const owned = state.owned[g.id] || 0;
+    const cost = costFor(g.baseCost, owned);
+    const btn = document.createElement('button');
+    btn.className = 'shop-item';
+    btn.disabled = state.total < cost;
+    btn.innerHTML =
+      '<div><div class="name">' + g.name + '<span class="owned">x' + owned + '</span></div>' +
+      '<div class="desc">' + g.desc + ' \u2014 ' + g.rate + '/s each</div></div>' +
+      '<div class="cost">' + fmt(cost) + '</div>';
+    btn.addEventListener('click', () => {
+      if (state.total < cost) return;
+      state.total -= cost;
+      state.owned[g.id] = owned + 1;
+      renderAll();
+      save();
+    });
+    generatorList.appendChild(btn);
+  });
+
+  upgradeList.innerHTML = '';
+  UPGRADES.forEach(u => {
+    const bought = state.bought[u.id] || 0;
+    const cost = costFor(u.baseCost, bought);
+    const btn = document.createElement('button');
+    btn.className = 'shop-item';
+    btn.disabled = state.total < cost;
+    btn.innerHTML =
+      '<div><div class="name">' + u.name + (bought ? '<span class="owned">x' + bought + '</span>' : '') + '</div>' +
+      '<div class="desc">' + u.desc + '</div></div>' +
+      '<div class="cost">' + fmt(cost) + '</div>';
+    btn.addEventListener('click', () => {
+      if (state.total < cost) return;
+      state.total -= cost;
+      state.bought[u.id] = bought + 1;
+      renderAll();
+      save();
+    });
+    upgradeList.appendChild(btn);
+  });
+}
+
+function renderStats() {
+  totalEl.textContent = fmt(state.total);
+  rateEl.textContent = fmt(totalRate()) + ' / sec';
+}
+
+function renderAll() {
+  renderStats();
+  renderShop();
+}
+
+starBtn.addEventListener('click', (e) => {
+  state.total += totalClickPower();
+  renderStats();
+  // Only re-render the shop when a button's affordability might have changed meaningfully
+  renderShop();
+
+  const rect = starBtn.getBoundingClientRect();
+  const f = document.createElement('div');
+  f.className = 'float';
+  f.textContent = '+' + fmt(totalClickPower());
+  f.style.left = (e.clientX - rect.left - 10) + 'px';
+  f.style.top = (e.clientY - rect.top - 10) + 'px';
+  starBtn.style.position = 'relative';
+  starBtn.appendChild(f);
+  setTimeout(() => f.remove(), 800);
+
+  save();
+});
+
+resetBtn.addEventListener('click', () => {
+  if (!confirm('Reset all progress? This can\'t be undone.')) return;
+  state = { total: 0, clickPower: 1, owned: {}, bought: {} };
+  save();
+  renderAll();
+});
+
+load();
+renderAll();
+
+setInterval(() => {
+  const perTick = totalRate() / 10;
+  if (perTick > 0) {
+    state.total += perTick;
+    renderStats();
+  }
+}, 100);
+
+setInterval(save, 4000);
+</script>
+
+</body>
+</html>
